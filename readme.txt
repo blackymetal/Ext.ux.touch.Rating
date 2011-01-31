@@ -32,3 +32,5 @@ The Rating control provides an intuitive rating experience that allows users to 
 					}]
 		})
 </code></pre> 
+
+UPDATE: added ability to clear current selected values by clicking on clear button. You may enable clear button by setting showClear: true. If you want to have empty star rating, set minValue: -1.

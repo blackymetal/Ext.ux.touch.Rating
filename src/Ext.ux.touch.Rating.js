@@ -59,7 +59,7 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
      * @cfg {Number} value 
      * Value represents index of far right selected star, i.e. if 4 stars selected value will be equal to 3
      */
- 	value: 0, 
+ 	value: undefined, 
  	
  	/**
      * @cfg {Array} items 
@@ -80,16 +80,28 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
  	itemsCount: undefined,
  	
  	/**
-     * @cfg {String} 
+     * @cfg {String} itemCls
      * Class to apply to the item when it is not selected
      */
  	itemCls: undefined,
  	
  	/**
-     * @cfg {String} 
+     * @cfg {String} itemHoverCls
      * Class to apply to the item when it is selected
      */
  	itemHoverCls: 'x-rating-item-hover',
+ 	
+ 	/**
+     * @cfg {String} clearCls
+     * Class to apply to the clear button
+     */
+ 	clearCls: 'x-rating-clear',
+ 	
+ 	/**
+     * @cfg {Boolean} showClear
+     * Determine whether to show clear button
+     */
+ 	showClear: false,
 	 	
  	renderTpl: [
  		'<tpl if="label">',
@@ -102,9 +114,12 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
 	                	'<tpl if="style">style="{style}" </tpl>',
 	                '>',
 	                '<tpl for="items">',
-	                	'<div index="{[xindex - 1]}"',
-	                		'<tpl if="cls">class="{cls} x-rating-item" </tpl>',
+	                	'<div index="{[xindex - 1]}" class="{cls} x-rating-item"',
 	                	'>{tooltip}</div>',
+	                '</tpl>',
+	                '<tpl if="showClear">',
+	                	'<div class="{clearCls}">',
+	                	'</div>',
 	                '</tpl>',
 	            '</div>',
             	'<tpl if="useClearIcon"><div class="x-field-clear-container"><div class="x-field-clear x-hidden-visibility">&#215;</div></div></tpl>',
@@ -158,7 +173,9 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
             tabIndex        :   this.tabIndex,
             inputType       :   this.inputType,
             useMask         :   this.useMask,
-            items			:	this.items
+            items			:	this.items,
+            showClear		:	this.showClear,
+            clearCls		:	this.clearCls
         });
         
         return this.renderData;
@@ -168,7 +185,7 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
     	Ext.ux.touch.Rating.superclass.onRender.apply(this, arguments);
     	
     	var dq = Ext.DomQuery;
-		var items = dq.select('.x-rating-field > div', this.el.dom);
+		var items = dq.select('.x-rating-field > .x-rating-item', this.el.dom);
     	Ext.each(items, function(item, index){
     		var el = Ext.get(item);
     		el.id = Ext.id();
@@ -181,7 +198,11 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
             touchmove: this.onTouchMove,
             preventDefault: true,
             scope: this
-        });    
+        });
+		if(this.showClear && this.clearCls){
+			this.clearBtn = this.el.down('.' + this.clearCls, false);
+			this.clearBtn.on('click', this.onClear, this);
+		}
     },
     
     onOrientationChanged: function(ctl, orientation, w, h) {
@@ -193,6 +214,10 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
      * Start assigning values (selecting stars) when user touched the control.
      */
     onTouchStart: function(e){
+    	if(e.target == this.clearBtn.dom){
+    		this.onClear();
+    		return;
+    	}
     	this.onTouchMove(e);
     },
     
@@ -224,8 +249,8 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
      * This method overrides original Sencha Touch's method because of support 0 value 
      */
     initValue: function() {
-    	var value = this.value;
-        this.setValue(Ext.isNumber(value) ? value : 0, true);
+    	var value = this.value != undefined && Ext.isNumber(value) ? this.value : this.minValue;
+        this.setValue(value, true);
 
         /**
          * The original value of the field as configured in the {@link #value} configuration, or
@@ -252,7 +277,6 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
 		    				var nextCls = items[j].hoverCls;
 		    				if(items[i].hasCls(nextCls)){
 		    					items[i].removeCls(nextCls);
-		    					//break;
 		    				}
 		    			}
 	    		}
@@ -290,5 +314,11 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
     
     getValue: function(){
     	return this.value;
+    },
+    
+    onClear: function(){
+    	if(!this.disabled){
+    		this.setValue(this.minValue);
+    	}
     }
  });

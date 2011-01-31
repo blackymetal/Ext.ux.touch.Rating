@@ -20,10 +20,12 @@ Ext.setup({
 						items : [
 							new Ext.ux.touch.Rating({
 								itemsCount : 5,
+								minValue: -1,
 								label : 'Star',
 								inputCls : 'x-rating-star-input',
 								itemCls : 'x-rating-star',
-								itemHoverCls : 'x-rating-star-hover'
+								itemHoverCls : 'x-rating-star-hover',
+								showClear: true
 							}),
 							new Ext.ux.touch.Rating({
 								itemsCount : 5,
@@ -32,7 +34,8 @@ Ext.setup({
 								inputCls : 'x-rating-star-input',
 								itemCls : 'x-rating-star',
 								itemHoverCls : 'x-rating-star-hover',
-								disabled: true
+								disabled: true,
+								showClear: true
 							}),
 							new Ext.ux.touch.Rating({
 								singleColorPerValue: true,
