@@ -269,6 +269,7 @@ Ext.ux.touch.Rating = Ext.extend(Ext.form.Field, {
     displayValue: function(value){
     	if(!this.rendered){
     		this.on('afterrender', Ext.createDelegate(this.displayValue, this, [value]), this, {single: true});
+    		return;
     	}
     	var items = this.items;
     	for(var i = 0; i < items.length; i++){
